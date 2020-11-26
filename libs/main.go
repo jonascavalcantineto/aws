@@ -12,6 +12,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudtrail"
+
+	//"github.com/aws/aws-sdk-go/service/cloudtrail"
+	"github.com/jonascavalcantineto/aws/libs/cloudtrailclient"
 )
 
 func main() {
@@ -29,8 +32,8 @@ func main() {
 	}
 
 	sess, err := session.NewSession()
-	svc := cloudtrail.New(sess)
-	//svc2 := cloudtrailclient.New(sess)
+	//svc := cloudtrail.New(sess)
+	svc := cloudtrailclient.New(sess)
 
 	maxResults := int64(1)
 
