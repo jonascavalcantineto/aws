@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cloudtrail"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -17,16 +16,21 @@ import (
 
 func main() {
 
-	// sess, err := session.NewSession(&aws.Config{
-	// 	Region: aws.String(endpoints.UsWest2RegionID),
-	// 	//Credentials: credentials.NewSharedCredentials("", "default"),
-	// 	Credentials: credentials.NewSharedCredentials("", "ps-investiment-qa"),
-	// })
+	type FailureEventRunTask struct {
+		ARN    string `json:"arn"`
+		Reason string `json:"reason"`
+	}
+
+	type TrailEventInfo struct {
+		EventVersion string                 `json:"eventVersion"`
+		UserIdentity map[string]interface{} `json:"userIdentity"`
+		EventTime    string                 `json:"eventTime"`
+		Failures     []FailureEventRunTask  `json:"failure"`
+	}
 
 	sess, err := session.NewSession()
+	svc := cloudtrail.New(sess)
 
-	// Create CloudTrail client
-	svc := awscloudtrail.CloudTrailNew(sess)
 	maxResults := int64(1)
 
 	input := &cloudtrail.LookupEventsInput{
@@ -48,43 +52,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Found", len(resp.Events), "events before now")
-	fmt.Println("")
-
-	failuremok := `{"failure":[
-		{"arn":"arn ecs:sa-east-1:360706934225:container-instance/0d9db362011747d389606f4e5496af6f","reason":"RESOURCE:CPU"},
-		{"arn":"arn ecs:sa-east-1:360706934225:container-instance/2503789574374dc691f2dc6b7230a4cd","reason":"RESOURCE:CPU"}
-	]}`
+	// failuremok := `{"failure":[
+	// 	{"arn":"arn ecs:sa-east-1:360706934225:container-instance/0d9db362011747d389606f4e5496af6f","reason":"RESOURCE:CPU"},
+	// 	{"arn":"arn ecs:sa-east-1:360706934225:container-instance/2503789574374dc691f2dc6b7230a4cd","reason":"RESOURCE:CPU"}
+	// ]}`
 	//failuremok := `{"failure":[]}`
-
-	type FailureEventRunTask struct {
-		ARN    string `json:"arn"`
-		Reason string `json:"reason"`
-	}
-
-	type TrailEventInfo struct {
-		EventVersion string                 `json:"eventVersion"`
-		UserIdentity map[string]interface{} `json:"userIdentity"`
-		EventTime    string                 `json:"eventTime"`
-		Failures     []FailureEventRunTask  `json:"failure"`
-	}
 
 	for _, event := range resp.Events {
 
-		//fmt.Println(aws.StringValue(event.CloudTrailEvent))
-		//fmt.Println(aws.StringValue(&failuremok))
 		var trailEventInfo TrailEventInfo
 
-		//json.Unmarshal([]byte(aws.StringValue(event.CloudTrailEvent)), &trailEventInfo)
-		json.Unmarshal([]byte(aws.StringValue(&failuremok)), &trailEventInfo)
+		json.Unmarshal([]byte(aws.StringValue(event.CloudTrailEvent)), &trailEventInfo)
+
+		//json.Unmarshal([]byte(aws.StringValue(&failuremok)), &trailEventInfo)
+
 		fmt.Println("Event: ")
 		fmt.Println("Name    ", aws.StringValue(event.EventName))
 		fmt.Println("Version: ", trailEventInfo.EventVersion)
-
 		fmt.Println("Time: ", trailEventInfo.EventTime)
 
 		if len(trailEventInfo.Failures) <= 0 {
-			//-k -g -X POST -d "payload={\"text\":\"Sem arquivos para mover\", \"channel\":\"#ec_casterlyrock_audit\", \"icon_emoji\":\":computer:\"}" https://hooks.slack.com/services/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
 			fmt.Println("No Failures")
 		} else {
 			var payload string
@@ -92,12 +79,9 @@ func main() {
 			payload += trailEventInfo.Failures[0].Reason + "\","
 			payload += "\"channel\":\" #ec_casterlyrock_hmg\", \"icon_emoji\":\":computer:\"}"
 
-			fmt.Println(payload)
-
 			url := "https://hooks.slack.com/services/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"
 
 			sendMessageToSlack(url, payload)
-			fmt.Println("Failures Detected: DEFCON 5 ")
 		}
 
 	}
@@ -111,7 +95,6 @@ func sendMessageToSlack(url string, paylod string) {
 	req.Header.Add("content-type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		fmt.Println("Error send message to Slack")
 		fmt.Println(err.Error())
