@@ -30,6 +30,7 @@ func main() {
 
 	sess, err := session.NewSession()
 	svc := cloudtrail.New(sess)
+	//svc2 := cloudtrailclient.New(sess)
 
 	maxResults := int64(1)
 
