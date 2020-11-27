@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -46,7 +47,7 @@ func main() {
 	// }
 
 	//resp, err := svc.LookupEvents(input)
-	resp, err := svc.LookupEventsAttribu
+	resp, err := svc.LookupEventsByAttributs("EventName", "RunTasks", time.Now().Add(-12*time.Hour).UTC(), time.Now().UTC(), &maxResults)
 	if err != nil {
 		fmt.Println("Got error calling Trails:")
 		fmt.Println(err.Error())

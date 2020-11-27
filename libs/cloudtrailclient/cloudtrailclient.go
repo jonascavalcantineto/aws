@@ -19,7 +19,7 @@ func New(sess *session.Session) *cloudtrail.CloudTrail {
 	return svc
 }
 
-//LookupEventsByAttributs (svc *cloudtrail.CloudTrail, attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error)
+//LookupEventsByAttributs (attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error)
 func LookupEventsByAttributs(attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error) {
 
 	input := &cloudtrail.LookupEventsInput{
