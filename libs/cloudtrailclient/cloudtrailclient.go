@@ -10,14 +10,17 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudtrail"
 )
 
+var svc cloudtrail.CloudTrail
+
 //New (sess *session.Session) *cloudtrail.CloudTrail
 //Creating a new Cloudtrail service
 func New(sess *session.Session) *cloudtrail.CloudTrail {
-	return cloudtrail.New(sess)
+	svc := cloudtrail.New(sess)
+	return svc
 }
 
 //LookupEventsByAttributs (svc *cloudtrail.CloudTrail, attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error)
-func LookupEventsByAttributs(svc *cloudtrail.CloudTrail, attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error) {
+func LookupEventsByAttributs(attributeKey string, attributeValue string, startTime time.Time, endTime time.Time, maxResults int64) (*cloudtrail.LookupEventsOutput, error) {
 
 	input := &cloudtrail.LookupEventsInput{
 		StartTime: aws.Time(time.Now().Add(-12 * time.Hour).UTC()),

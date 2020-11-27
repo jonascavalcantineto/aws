@@ -7,13 +7,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudtrail"
-
-	//"github.com/aws/aws-sdk-go/service/cloudtrail"
 	"github.com/jonascavalcantineto/aws/libs/cloudtrailclient"
 )
 
@@ -37,19 +33,20 @@ func main() {
 
 	maxResults := int64(1)
 
-	input := &cloudtrail.LookupEventsInput{
-		StartTime: aws.Time(time.Now().Add(-12 * time.Hour).UTC()),
-		EndTime:   aws.Time(time.Now().UTC()),
-		LookupAttributes: []*cloudtrail.LookupAttribute{
-			{
-				AttributeKey:   aws.String("EventName"),
-				AttributeValue: aws.String("RunTask"),
-			},
-		},
-		MaxResults: &maxResults,
-	}
+	// input := &cloudtrail.LookupEventsInput{
+	// 	StartTime: aws.Time(time.Now().Add(-12 * time.Hour).UTC()),
+	// 	EndTime:   aws.Time(time.Now().UTC()),
+	// 	LookupAttributes: []*cloudtrail.LookupAttribute{
+	// 		{
+	// 			AttributeKey:   aws.String("EventName"),
+	// 			AttributeValue: aws.String("RunTask"),
+	// 		},
+	// 	},
+	// 	MaxResults: &maxResults,
+	// }
 
-	resp, err := svc.LookupEvents(input)
+	//resp, err := svc.LookupEvents(input)
+	resp, err := svc.LookupEventsAttribu
 	if err != nil {
 		fmt.Println("Got error calling Trails:")
 		fmt.Println(err.Error())
